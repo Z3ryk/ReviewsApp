@@ -10,6 +10,7 @@ final class ReviewsViewController: UIViewController {
         super.init(nibName: nil, bundle: nil)
     }
 
+    @available(*, unavailable)
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
@@ -35,13 +36,24 @@ private extension ReviewsViewController {
         let reviewsView = ReviewsView()
         reviewsView.tableView.delegate = viewModel
         reviewsView.tableView.dataSource = viewModel
+        reviewsView.refreshControl.addTarget(
+            self,
+            action: #selector(didPullToRefreshReviews),
+            for: .valueChanged
+        )
         return reviewsView
     }
 
     func setupViewModel() {
         viewModel.onStateChange = { [weak reviewsView] _ in
+            reviewsView?.refreshControl.endRefreshing()
             reviewsView?.tableView.reloadData()
         }
+    }
+
+    @objc
+    func didPullToRefreshReviews() {
+        viewModel.refreshReviews()
     }
 
 }
