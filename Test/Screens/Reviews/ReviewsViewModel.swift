@@ -89,7 +89,9 @@ private extension ReviewsViewModel {
             created: created,
             userName: fullName,
             ratingImage: ratingImage,
-            onTapShowMore: showMoreReview
+            onTapShowMore: { [weak self] id in
+                self?.showMoreReview(with: id)
+            }
         )
         return item
     }
