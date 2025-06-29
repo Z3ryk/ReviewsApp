@@ -36,7 +36,11 @@ extension ReviewsViewModel {
     func getReviews() {
         guard state.shouldLoad else { return }
         state.shouldLoad = false
-        reviewsProvider.getReviews(offset: state.offset, completion: gotReviews)
+        DispatchQueue.global(qos: .userInteractive).async { [weak self] in
+            guard let self else { return }
+
+            reviewsProvider.getReviews(offset: state.offset, completion: gotReviews)
+        }
     }
 
 }
@@ -56,7 +60,12 @@ private extension ReviewsViewModel {
         } catch {
             state.shouldLoad = true
         }
-        onStateChange?(state)
+
+        DispatchQueue.main.async { [weak self] in
+            guard let self else { return }
+            
+            onStateChange?(state)
+        }
     }
 
     /// Метод, вызываемый при нажатии на кнопку "Показать полностью...".
