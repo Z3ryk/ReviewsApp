@@ -138,6 +138,11 @@ private extension ReviewCell {
         contentView.addSubview(showMoreButton)
         showMoreButton.contentVerticalAlignment = .fill
         showMoreButton.setAttributedTitle(Config.showMoreText, for: .normal)
+        showMoreButton.addTarget(
+            self,
+            action: #selector(showMoreTapped),
+            for: .touchUpInside
+        )
     }
     
     func setupRatingImageView() {
@@ -147,6 +152,13 @@ private extension ReviewCell {
     
     func setRatingImage(_ ratingImage: UIImage) {
         ratingImageView.image = ratingImage
+    }
+
+    @objc
+    func showMoreTapped() {
+        guard let config else { return }
+
+        config.onTapShowMore(config.id)
     }
 
 }
