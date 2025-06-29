@@ -8,5 +8,6 @@ struct Review: Decodable {
     let text: String
     /// Время создания отзыва
     let created: String
-
+    ///  Рейтинг отзыва
+    let rating: Int
 }

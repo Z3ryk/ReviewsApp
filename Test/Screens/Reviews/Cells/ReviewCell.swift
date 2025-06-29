@@ -16,6 +16,8 @@ struct ReviewCellConfig {
     let created: NSAttributedString
     /// Полное имя пользователя
     let userName: String
+    /// Изображение рейтинг отзыва
+    let ratingImage: UIImage
     /// Замыкание, вызываемое при нажатии на кнопку "Показать полностью...".
     let onTapShowMore: (UUID) -> Void
 
@@ -38,6 +40,7 @@ extension ReviewCellConfig: TableCellConfig {
         cell.reviewTextLabel.numberOfLines = maxLines
         cell.createdLabel.attributedText = created
         cell.config = self
+        cell.setRatingImage(ratingImage)
     }
 
     /// Метод, возвращаюший высоту ячейки с данным ограничением по размеру.
@@ -69,6 +72,7 @@ final class ReviewCell: UITableViewCell {
     fileprivate let showMoreButton = UIButton()
     fileprivate let avatarImageView = UIImageView()
     fileprivate let userNameLabel = UILabel()
+    fileprivate let ratingImageView = UIImageView()
 
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
@@ -89,6 +93,7 @@ final class ReviewCell: UITableViewCell {
         createdLabel.frame = layout.createdLabelFrame
         showMoreButton.frame = layout.showMoreButtonFrame
         userNameLabel.frame = layout.userNameLabelFrame
+        ratingImageView.frame = layout.ratingImageFrame
     }
 
 }
@@ -103,6 +108,7 @@ private extension ReviewCell {
         setupCreatedLabel()
         setupShowMoreButton()
         setupUserNameLabel()
+        setupRatingImageView()
     }
     
     func setupAvatarImageView() {
@@ -133,6 +139,15 @@ private extension ReviewCell {
         showMoreButton.contentVerticalAlignment = .fill
         showMoreButton.setAttributedTitle(Config.showMoreText, for: .normal)
     }
+    
+    func setupRatingImageView() {
+        contentView.addSubview(ratingImageView)
+        ratingImageView.contentMode = .left
+    }
+    
+    func setRatingImage(_ ratingImage: UIImage) {
+        ratingImageView.image = ratingImage
+    }
 
 }
 
@@ -158,6 +173,7 @@ private final class ReviewCellLayout {
     private(set) var createdLabelFrame = CGRect.zero
     private(set) var avatarImageFrame = CGRect.zero
     private(set) var userNameLabelFrame = CGRect.zero
+    private(set) var ratingImageFrame = CGRect.zero
 
     // MARK: - Отступы
 
@@ -201,6 +217,12 @@ private final class ReviewCellLayout {
             size: CGSize(width: width, height: 18)
         )
         maxY = userNameLabelFrame.maxY + usernameToRatingSpacing
+
+        ratingImageFrame = CGRect(
+            origin: CGPoint(x: textOriginX, y: maxY),
+            size: CGSize(width: 80, height: 16)
+        )
+        maxY = ratingImageFrame.maxY + ratingToTextSpacing
 
         if !config.reviewText.isEmpty() {
             // Высота текста с текущим ограничением по количеству строк.
