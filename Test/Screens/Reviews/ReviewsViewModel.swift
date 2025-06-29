@@ -43,6 +43,14 @@ extension ReviewsViewModel {
         }
     }
 
+    /// Метод повторной загрузки отзывов
+    func refreshReviews() {
+        state.offset = 0
+        state.shouldLoad = true
+
+        getReviews()
+    }
+
 }
 
 // MARK: - Private
@@ -54,7 +62,12 @@ private extension ReviewsViewModel {
         do {
             let data = try result.get()
             let reviews = try decoder.decode(Reviews.self, from: data)
-            state.items += reviews.items.map(makeReviewItem)
+            let items = reviews.items.map(makeReviewItem)
+            if state.offset == .zero {
+                state.items = items
+            } else {
+                state.items += items
+            }
             state.offset += state.limit
             state.shouldLoad = state.offset < reviews.count
         } catch {
