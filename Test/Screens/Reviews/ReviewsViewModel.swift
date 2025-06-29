@@ -70,6 +70,10 @@ private extension ReviewsViewModel {
             }
             state.offset += state.limit
             state.shouldLoad = state.offset < reviews.count
+
+            if !state.shouldLoad {
+                state.items.append(makeReviewsTotalCountItem(reviewsCount: reviews.count))
+            }
         } catch {
             state.shouldLoad = true
         }
@@ -116,6 +120,12 @@ private extension ReviewsViewModel {
             }
         )
         return item
+    }
+
+    typealias ReviewsTotalCountItem = ReviewsTotalCountCellConfig
+
+    func makeReviewsTotalCountItem(reviewsCount: UInt) -> ReviewsTotalCountItem {
+        ReviewsTotalCountItem(text: "\(reviewsCount) отзывов")
     }
 
 }
