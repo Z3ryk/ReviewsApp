@@ -63,6 +63,7 @@ final class ReviewCell: UITableViewCell {
     fileprivate let reviewTextLabel = UILabel()
     fileprivate let createdLabel = UILabel()
     fileprivate let showMoreButton = UIButton()
+    fileprivate let avatarImageView = UIImageView()
 
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
@@ -75,7 +76,10 @@ final class ReviewCell: UITableViewCell {
 
     override func layoutSubviews() {
         super.layoutSubviews()
+
         guard let layout = config?.layout else { return }
+
+        avatarImageView.frame = layout.avatarImageFrame
         reviewTextLabel.frame = layout.reviewTextLabelFrame
         createdLabel.frame = layout.createdLabelFrame
         showMoreButton.frame = layout.showMoreButtonFrame
@@ -88,9 +92,18 @@ final class ReviewCell: UITableViewCell {
 private extension ReviewCell {
 
     func setupCell() {
+        setupAvatarImageView()
         setupReviewTextLabel()
         setupCreatedLabel()
         setupShowMoreButton()
+    }
+    
+    func setupAvatarImageView() {
+        contentView.addSubview(avatarImageView)
+        avatarImageView.contentMode = .scaleAspectFill
+        avatarImageView.layer.cornerRadius = Layout.avatarCornerRadius
+        avatarImageView.clipsToBounds = true
+        avatarImageView.image = .l5W5AIHioYc
     }
 
     func setupReviewTextLabel() {
@@ -130,6 +143,7 @@ private final class ReviewCellLayout {
     private(set) var reviewTextLabelFrame = CGRect.zero
     private(set) var showMoreButtonFrame = CGRect.zero
     private(set) var createdLabelFrame = CGRect.zero
+    private(set) var avatarImageFrame = CGRect.zero
 
     // MARK: - Отступы
 
@@ -161,6 +175,11 @@ private final class ReviewCellLayout {
 
         var maxY = insets.top
         var showShowMoreButton = false
+
+        avatarImageFrame = CGRect (
+            origin: CGPoint(x: insets.left, y: insets.top),
+            size: Layout.avatarSize
+        )
 
         if !config.reviewText.isEmpty() {
             // Высота текста с текущим ограничением по количеству строк.
