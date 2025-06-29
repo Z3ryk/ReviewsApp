@@ -14,6 +14,10 @@ struct ReviewCellConfig {
     var maxLines = 3
     /// Время создания отзыва.
     let created: NSAttributedString
+    /// Полное имя пользователя
+    let userName: String
+    /// Изображение рейтинг отзыва
+    let ratingImage: UIImage
     /// Замыкание, вызываемое при нажатии на кнопку "Показать полностью...".
     let onTapShowMore: (UUID) -> Void
 
@@ -30,10 +34,13 @@ extension ReviewCellConfig: TableCellConfig {
     /// Вызывается из `cellForRowAt:` у `dataSource` таблицы.
     func update(cell: UITableViewCell) {
         guard let cell = cell as? ReviewCell else { return }
+
+        cell.userNameLabel.text = userName
         cell.reviewTextLabel.attributedText = reviewText
         cell.reviewTextLabel.numberOfLines = maxLines
         cell.createdLabel.attributedText = created
         cell.config = self
+        cell.setRatingImage(ratingImage)
     }
 
     /// Метод, возвращаюший высоту ячейки с данным ограничением по размеру.
@@ -63,6 +70,9 @@ final class ReviewCell: UITableViewCell {
     fileprivate let reviewTextLabel = UILabel()
     fileprivate let createdLabel = UILabel()
     fileprivate let showMoreButton = UIButton()
+    fileprivate let avatarImageView = UIImageView()
+    fileprivate let userNameLabel = UILabel()
+    fileprivate let ratingImageView = UIImageView()
 
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
@@ -75,10 +85,15 @@ final class ReviewCell: UITableViewCell {
 
     override func layoutSubviews() {
         super.layoutSubviews()
+
         guard let layout = config?.layout else { return }
+
+        avatarImageView.frame = layout.avatarImageFrame
         reviewTextLabel.frame = layout.reviewTextLabelFrame
         createdLabel.frame = layout.createdLabelFrame
         showMoreButton.frame = layout.showMoreButtonFrame
+        userNameLabel.frame = layout.userNameLabelFrame
+        ratingImageView.frame = layout.ratingImageFrame
     }
 
 }
@@ -88,9 +103,26 @@ final class ReviewCell: UITableViewCell {
 private extension ReviewCell {
 
     func setupCell() {
+        setupAvatarImageView()
         setupReviewTextLabel()
         setupCreatedLabel()
         setupShowMoreButton()
+        setupUserNameLabel()
+        setupRatingImageView()
+    }
+    
+    func setupAvatarImageView() {
+        contentView.addSubview(avatarImageView)
+        avatarImageView.contentMode = .scaleAspectFill
+        avatarImageView.layer.cornerRadius = Layout.avatarCornerRadius
+        avatarImageView.clipsToBounds = true
+        avatarImageView.image = .l5W5AIHioYc
+    }
+
+    func setupUserNameLabel() {
+        contentView.addSubview(userNameLabel)
+        userNameLabel.font = .username
+        userNameLabel.textColor = .label
     }
 
     func setupReviewTextLabel() {
@@ -106,6 +138,15 @@ private extension ReviewCell {
         contentView.addSubview(showMoreButton)
         showMoreButton.contentVerticalAlignment = .fill
         showMoreButton.setAttributedTitle(Config.showMoreText, for: .normal)
+    }
+    
+    func setupRatingImageView() {
+        contentView.addSubview(ratingImageView)
+        ratingImageView.contentMode = .left
+    }
+    
+    func setRatingImage(_ ratingImage: UIImage) {
+        ratingImageView.image = ratingImage
     }
 
 }
@@ -130,6 +171,9 @@ private final class ReviewCellLayout {
     private(set) var reviewTextLabelFrame = CGRect.zero
     private(set) var showMoreButtonFrame = CGRect.zero
     private(set) var createdLabelFrame = CGRect.zero
+    private(set) var avatarImageFrame = CGRect.zero
+    private(set) var userNameLabelFrame = CGRect.zero
+    private(set) var ratingImageFrame = CGRect.zero
 
     // MARK: - Отступы
 
@@ -157,10 +201,28 @@ private final class ReviewCellLayout {
 
     /// Возвращает высоту ячейку с данной конфигурацией `config` и ограничением по ширине `maxWidth`.
     func height(config: Config, maxWidth: CGFloat) -> CGFloat {
-        let width = maxWidth - insets.left - insets.right
+        let textOriginX = insets.left + Self.avatarSize.width + avatarToUsernameSpacing
+        let width = maxWidth - textOriginX - insets.right
 
         var maxY = insets.top
         var showShowMoreButton = false
+
+        avatarImageFrame = CGRect (
+            origin: CGPoint(x: insets.left, y: insets.top),
+            size: Layout.avatarSize
+        )
+
+        userNameLabelFrame = CGRect(
+            origin: CGPoint(x: textOriginX, y: maxY),
+            size: CGSize(width: width, height: 18)
+        )
+        maxY = userNameLabelFrame.maxY + usernameToRatingSpacing
+
+        ratingImageFrame = CGRect(
+            origin: CGPoint(x: textOriginX, y: maxY),
+            size: CGSize(width: 80, height: 16)
+        )
+        maxY = ratingImageFrame.maxY + ratingToTextSpacing
 
         if !config.reviewText.isEmpty() {
             // Высота текста с текущим ограничением по количеству строк.
@@ -171,7 +233,7 @@ private final class ReviewCellLayout {
             showShowMoreButton = config.maxLines != .zero && actualTextHeight > currentTextHeight
 
             reviewTextLabelFrame = CGRect(
-                origin: CGPoint(x: insets.left, y: maxY),
+                origin: CGPoint(x: textOriginX, y: maxY),
                 size: config.reviewText.boundingRect(width: width, height: currentTextHeight).size
             )
             maxY = reviewTextLabelFrame.maxY + reviewTextToCreatedSpacing
@@ -179,7 +241,7 @@ private final class ReviewCellLayout {
 
         if showShowMoreButton {
             showMoreButtonFrame = CGRect(
-                origin: CGPoint(x: insets.left, y: maxY),
+                origin: CGPoint(x: textOriginX, y: maxY),
                 size: Self.showMoreButtonSize
             )
             maxY = showMoreButtonFrame.maxY + showMoreToCreatedSpacing
@@ -188,7 +250,7 @@ private final class ReviewCellLayout {
         }
 
         createdLabelFrame = CGRect(
-            origin: CGPoint(x: insets.left, y: maxY),
+            origin: CGPoint(x: textOriginX, y: maxY),
             size: config.created.boundingRect(width: width).size
         )
 
