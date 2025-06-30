@@ -8,6 +8,8 @@ struct Review: Decodable {
     let lastName: String
     /// Ссылка на аватар пользователя
     let avatarUrl: URL?
+    /// Названия фотографий
+    var photos: [String]?
     /// Текст отзыва
     let text: String
     /// Время создания отзыва

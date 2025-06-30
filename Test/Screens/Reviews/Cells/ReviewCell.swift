@@ -20,6 +20,8 @@ struct ReviewCellConfig {
     let ratingImage: UIImage
     /// Ссылка на аватар пользователя
     let avatarUrl: URL?
+    /// Названия фотографий
+    let photos: [String]?
     /// Замыкание, вызываемое при нажатии на кнопку "Показать полностью...".
     let onTapShowMore: (UUID) -> Void
 
@@ -43,6 +45,7 @@ extension ReviewCellConfig: TableCellConfig {
         cell.createdLabel.attributedText = created
         cell.config = self
         cell.setRatingImage(ratingImage)
+        photos.map(cell.addPhotos)
 
         cell.avatarLoadingTask?.cancel()
         cell.avatarLoadingTask = Task {
@@ -90,6 +93,8 @@ final class ReviewCell: UITableViewCell {
     fileprivate let avatarImageView = UIImageView()
     fileprivate let userNameLabel = UILabel()
     fileprivate let ratingImageView = UIImageView()
+    fileprivate let photosStackView = UIStackView()
+    fileprivate let photosScrollView = UIScrollView()
 
     fileprivate var avatarLoadingTask: Task<Void, Never>?
 
@@ -114,6 +119,9 @@ final class ReviewCell: UITableViewCell {
         showMoreButton.frame = layout.showMoreButtonFrame
         userNameLabel.frame = layout.userNameLabelFrame
         ratingImageView.frame = layout.ratingImageFrame
+        photosStackView.frame = layout.photosStackViewFrame
+        photosScrollView.frame = layout.photosScrollViewFrame
+        photosScrollView.contentSize = layout.photosStackViewFrame.size
     }
 
     override func prepareForReuse() {
@@ -128,6 +136,9 @@ final class ReviewCell: UITableViewCell {
         userNameLabel.text = nil
         ratingImageView.image = nil
         config = nil
+        photosStackView.arrangedSubviews.forEach {
+            $0.removeFromSuperview()
+        }
     }
 
 }
@@ -143,6 +154,8 @@ private extension ReviewCell {
         setupShowMoreButton()
         setupUserNameLabel()
         setupRatingImageView()
+        setupPhotosScrollView()
+        setupPhotosStackView()
     }
 
     func setupAvatarImageView() {
@@ -183,7 +196,32 @@ private extension ReviewCell {
         contentView.addSubview(ratingImageView)
         ratingImageView.contentMode = .left
     }
-    
+
+    func setupPhotosScrollView() {
+        contentView.addSubview(photosScrollView)
+        photosScrollView.showsHorizontalScrollIndicator = false
+        photosScrollView.showsHorizontalScrollIndicator = false
+    }
+
+    func setupPhotosStackView() {
+        photosScrollView.addSubview(photosStackView)
+        photosStackView.axis = .horizontal
+        photosStackView.alignment = .fill
+        photosStackView.distribution = .fillEqually
+        photosStackView.spacing = 8.0
+    }
+
+    func addPhotos(_ photos: [String]) {
+        for photo in photos {
+            let imageView = UIImageView()
+            imageView.contentMode = .scaleAspectFill
+            imageView.clipsToBounds = true
+            imageView.layer.cornerRadius = Layout.photoCornerRadius
+            imageView.image = UIImage(named: photo)
+            photosStackView.addArrangedSubview(imageView)
+        }
+    }
+
     func setRatingImage(_ ratingImage: UIImage) {
         ratingImageView.image = ratingImage
     }
@@ -220,6 +258,8 @@ private final class ReviewCellLayout {
     private(set) var avatarImageFrame = CGRect.zero
     private(set) var userNameLabelFrame = CGRect.zero
     private(set) var ratingImageFrame = CGRect.zero
+    private(set) var photosStackViewFrame = CGRect.zero
+    private(set) var photosScrollViewFrame = CGRect.zero
 
     // MARK: - Отступы
 
@@ -253,6 +293,8 @@ private final class ReviewCellLayout {
         var maxY = insets.top
         var showShowMoreButton = false
 
+        let hasPhotos = config.photos?.isEmpty == false
+
         avatarImageFrame = CGRect (
             origin: CGPoint(x: insets.left, y: insets.top),
             size: Layout.avatarSize
@@ -268,7 +310,27 @@ private final class ReviewCellLayout {
             origin: CGPoint(x: textOriginX, y: maxY),
             size: CGSize(width: 80, height: 16)
         )
-        maxY = ratingImageFrame.maxY + ratingToTextSpacing
+        maxY = ratingImageFrame.maxY + (!hasPhotos ? ratingToTextSpacing : ratingToPhotosSpacing)
+
+        if hasPhotos, let count = config.photos?.count {
+            let photosCount = CGFloat(count)
+            let photosWidth = (Layout.photoSize.width * photosCount) + (photosSpacing * (photosCount - 1))
+            photosScrollViewFrame = CGRect(
+                origin: CGPoint(x: textOriginX, y: maxY),
+                size: CGSize(
+                    width: min(
+                        photosWidth,
+                        maxWidth - insets.right - insets.left - Layout.avatarSize.width - avatarToUsernameSpacing
+                    ),
+                    height: Layout.photoSize.height
+                )
+            )
+            maxY = photosScrollViewFrame.maxY + photosToTextSpacing
+            photosStackViewFrame = CGRect(
+                origin: .zero,
+                size: CGSize(width: photosWidth, height: Layout.photoSize.height)
+            )
+        }
 
         if !config.reviewText.isEmpty() {
             // Высота текста с текущим ограничением по количеству строк.
