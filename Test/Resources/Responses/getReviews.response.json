@@ -5,7 +5,7 @@
             "first_name": "Иван",
             "last_name": "Петров",
             "avatar_url": "https://sun9-8.userapi.com/s/v1/ig2/aIEjedUmOO40f6ioEsDMuOOv3y5EQi6Uc1fXutMBgSt5mG-HenbmridQrGsOd0BP9s7HMSSIcbWO7V7rBN5cMRWP.jpg?quality=95&as=32x32,48x48,72x72,108x108,160x160,240x240,360x360,480x480,540x540,640x640,720x720,1080x1080&from=bu&cs=1080x0",
-            "photos": ["IMG_0001", "IMG_0002", "IMG_0003", "IMG_0004", "IMG_0005", "IMG_0006", "IMG_0001"],
+            "photos": ["IMG_0001", "IMG_0002", "IMG_0003", "IMG_0004", "IMG_0005"],
             "rating": 5,
             "text": "Кроссовки хорошие. Удобные. Как по мне сшиты.",
             "created": "1 час назад"
@@ -87,7 +87,7 @@
         {
             "first_name": "Илья",
             "last_name": "Петров",
-            "photos": ["IMG_0001", "IMG_0002", "IMG_0003", "IMG_0004", "IMG_0005", "IMG_0006", "IMG_0001"],
+            "photos": ["IMG_0001", "IMG_0002", "IMG_0003", "IMG_0004", "IMG_0005"],
             "rating": 2,
             "text": "Понравилось отношение - несмотря на то, что заказ был выполнен не идеально, продавец был очень любезен и шёл... Прошла по снегу 30 метров, 5 раз упала. Спасибо мужу, поддерживал. Возврат, к сожалению.",
             "created": "минуту назад"
