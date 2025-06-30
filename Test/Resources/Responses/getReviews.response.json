@@ -5,6 +5,7 @@
             "first_name": "Иван",
             "last_name": "Петров",
             "avatar_url": "https://sun9-8.userapi.com/s/v1/ig2/aIEjedUmOO40f6ioEsDMuOOv3y5EQi6Uc1fXutMBgSt5mG-HenbmridQrGsOd0BP9s7HMSSIcbWO7V7rBN5cMRWP.jpg?quality=95&as=32x32,48x48,72x72,108x108,160x160,240x240,360x360,480x480,540x540,640x640,720x720,1080x1080&from=bu&cs=1080x0",
+            "photos": ["IMG_0001", "IMG_0002", "IMG_0003", "IMG_0004", "IMG_0005", "IMG_0006", "IMG_0001"],
             "rating": 5,
             "text": "Кроссовки хорошие. Удобные. Как по мне сшиты.",
             "created": "1 час назад"
@@ -28,6 +29,7 @@
         {
             "first_name": "Илья",
             "last_name": "Петров",
+            "photos": ["IMG_0003", "IMG_0004"],
             "rating": 2,
             "text": "Понравилось отношение - несмотря на то, что заказ был выполнен не идеально, продавец был очень любезен и шёл... Прошла по снегу 30 метров, 5 раз упала. Спасибо мужу, поддерживал. Возврат, к сожалению.",
             "created": "минуту назад"
@@ -44,6 +46,7 @@
             "first_name": "Олег",
             "last_name": "Николаев",
             "avatar_url": "https://sun9-9.userapi.com/s/v1/ig2/-Y8ynz5hm0-YWyDw9dQYCu3ve3B-G-jj3ecERStiW9b01rLw3G9EoJym_ocQDoqHGQKXuku8PfboxSWbbCBe05Da.jpg?quality=95&as=32x40,48x61,72x91,108x136,160x202,240x303,360x454,480x606,540x681,640x807,720x908,856x1080&from=bu&cs=856x0",
+            "photos": ["IMG_0005", "IMG_0006"],
             "rating": 1,
             "text": "Ребёнок жалуется, что очень скользские. Пока шла до школы...",
             "created": "15 минут назад"
@@ -84,6 +87,7 @@
         {
             "first_name": "Илья",
             "last_name": "Петров",
+            "photos": ["IMG_0001", "IMG_0002", "IMG_0003", "IMG_0004", "IMG_0005", "IMG_0006", "IMG_0001"],
             "rating": 2,
             "text": "Понравилось отношение - несмотря на то, что заказ был выполнен не идеально, продавец был очень любезен и шёл... Прошла по снегу 30 метров, 5 раз упала. Спасибо мужу, поддерживал. Возврат, к сожалению.",
             "created": "минуту назад"

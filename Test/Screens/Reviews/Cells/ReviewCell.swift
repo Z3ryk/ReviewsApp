@@ -20,6 +20,8 @@ struct ReviewCellConfig {
     let ratingImage: UIImage
     /// Ссылка на аватар пользователя
     let avatarUrl: URL?
+    /// Названия фотографий
+    let photos: [String]?
     /// Замыкание, вызываемое при нажатии на кнопку "Показать полностью...".
     let onTapShowMore: (UUID) -> Void
 
