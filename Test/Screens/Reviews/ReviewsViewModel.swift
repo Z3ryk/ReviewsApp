@@ -4,7 +4,9 @@ import UIKit
 final class ReviewsViewModel: NSObject {
 
     /// Замыкание, вызываемое при изменении `state`.
-    var onStateChange: ((State) -> Void)?
+    var onStateChange: ((ViewState) -> Void)?
+
+    var hasContent: Bool { state.items.isEmpty == false }
 
     private var state: State
     private let reviewsProvider: ReviewsProvider
@@ -31,11 +33,13 @@ final class ReviewsViewModel: NSObject {
 extension ReviewsViewModel {
 
     typealias State = ReviewsViewModelState
+    typealias ViewState = ReviewsViewState
 
     /// Метод получения отзывов.
     func getReviews() {
         guard state.shouldLoad else { return }
         state.shouldLoad = false
+        onStateChange?(.loading)
         DispatchQueue.global(qos: .userInteractive).async { [weak self] in
             guard let self else { return }
 
@@ -76,12 +80,17 @@ private extension ReviewsViewModel {
             }
         } catch {
             state.shouldLoad = true
+            DispatchQueue.main.async { [weak self] in
+                guard let self else { return }
+
+                onStateChange?(.error)
+            }
         }
 
         DispatchQueue.main.async { [weak self] in
             guard let self else { return }
             
-            onStateChange?(state)
+            onStateChange?(.content)
         }
     }
 
@@ -94,7 +103,7 @@ private extension ReviewsViewModel {
         else { return }
         item.maxLines = .zero
         state.items[index] = item
-        onStateChange?(state)
+        onStateChange?(.content)
     }
 
 }
