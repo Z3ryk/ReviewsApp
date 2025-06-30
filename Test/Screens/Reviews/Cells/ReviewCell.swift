@@ -45,6 +45,7 @@ extension ReviewCellConfig: TableCellConfig {
         cell.createdLabel.attributedText = created
         cell.config = self
         cell.setRatingImage(ratingImage)
+        photos.map(cell.addPhotos)
 
         cell.avatarLoadingTask?.cancel()
         cell.avatarLoadingTask = Task {
@@ -135,6 +136,9 @@ final class ReviewCell: UITableViewCell {
         userNameLabel.text = nil
         ratingImageView.image = nil
         config = nil
+        photosStackView.arrangedSubviews.forEach {
+            $0.removeFromSuperview()
+        }
     }
 
 }
@@ -205,6 +209,17 @@ private extension ReviewCell {
         photosStackView.alignment = .fill
         photosStackView.distribution = .fillEqually
         photosStackView.spacing = 8.0
+    }
+
+    func addPhotos(_ photos: [String]) {
+        for photo in photos {
+            let imageView = UIImageView()
+            imageView.contentMode = .scaleAspectFill
+            imageView.clipsToBounds = true
+            imageView.layer.cornerRadius = Layout.photoCornerRadius
+            imageView.image = UIImage(named: photo)
+            photosStackView.addArrangedSubview(imageView)
+        }
     }
 
     func setRatingImage(_ ratingImage: UIImage) {
