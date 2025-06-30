@@ -18,6 +18,8 @@ struct ReviewCellConfig {
     let userName: String
     /// Изображение рейтинг отзыва
     let ratingImage: UIImage
+    /// Ссылка на аватар пользователя
+    let avatarUrl: URL?
     /// Замыкание, вызываемое при нажатии на кнопку "Показать полностью...".
     let onTapShowMore: (UUID) -> Void
 
@@ -41,6 +43,21 @@ extension ReviewCellConfig: TableCellConfig {
         cell.createdLabel.attributedText = created
         cell.config = self
         cell.setRatingImage(ratingImage)
+
+        cell.avatarLoadingTask?.cancel()
+        cell.avatarLoadingTask = Task {
+            if
+                let avatarUrl,
+                Task.isCancelled == false,
+                let image = await ImageLoader.shared.image(for: avatarUrl)
+            {
+                await MainActor.run {
+                    guard cell.config?.id == self.id else { return }
+
+                    cell.avatarImageView.image = image
+                }
+            }
+        }
     }
 
     /// Метод, возвращаюший высоту ячейки с данным ограничением по размеру.
@@ -74,6 +91,9 @@ final class ReviewCell: UITableViewCell {
     fileprivate let userNameLabel = UILabel()
     fileprivate let ratingImageView = UIImageView()
 
+    fileprivate var avatarLoadingTask: Task<Void, Never>?
+
+    @available(*, unavailable)
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
@@ -96,6 +116,20 @@ final class ReviewCell: UITableViewCell {
         ratingImageView.frame = layout.ratingImageFrame
     }
 
+    override func prepareForReuse() {
+        super.prepareForReuse()
+
+        avatarLoadingTask?.cancel()
+        avatarImageView.image = .l5W5AIHioYc
+
+        reviewTextLabel.attributedText = nil
+        reviewTextLabel.numberOfLines = 1
+        createdLabel.attributedText = nil
+        userNameLabel.text = nil
+        ratingImageView.image = nil
+        config = nil
+    }
+
 }
 
 // MARK: - Private
@@ -110,7 +144,7 @@ private extension ReviewCell {
         setupUserNameLabel()
         setupRatingImageView()
     }
-    
+
     func setupAvatarImageView() {
         contentView.addSubview(avatarImageView)
         avatarImageView.contentMode = .scaleAspectFill
@@ -144,7 +178,7 @@ private extension ReviewCell {
             for: .touchUpInside
         )
     }
-    
+
     func setupRatingImageView() {
         contentView.addSubview(ratingImageView)
         ratingImageView.contentMode = .left
