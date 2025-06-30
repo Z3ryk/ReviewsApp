@@ -45,9 +45,19 @@ private extension ReviewsViewController {
     }
 
     func setupViewModel() {
-        viewModel.onStateChange = { [weak reviewsView] _ in
-            reviewsView?.refreshControl.endRefreshing()
-            reviewsView?.tableView.reloadData()
+        viewModel.onStateChange = { [weak reviewsView, weak viewModel] viewState in
+            switch viewState {
+            case .loading:
+                guard viewModel?.hasContent == false else { return }
+
+                reviewsView?.setLoadingViewHidden(false)
+            case .content:
+                reviewsView?.refreshControl.endRefreshing()
+                reviewsView?.tableView.reloadData()
+                reviewsView?.setLoadingViewHidden(true)
+            case .error:
+                reviewsView?.setLoadingViewHidden(true)
+            }
         }
     }
 
