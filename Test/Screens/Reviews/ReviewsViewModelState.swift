@@ -7,3 +7,9 @@ struct ReviewsViewModelState {
     var shouldLoad = true
 
 }
+
+enum ReviewsViewState {
+    case loading
+    case content
+    case error
+}
